@@ -1,51 +1,7 @@
-import mysql.connector
-from mysql.connector import Error
-from datetime import datetime
+
 import keyboard
-
-def conectar_mysql():
-    try:
-        conn = mysql.connector.connect(
-            host="localhost",
-            user="py",
-            password="1234",
-            database="chamada_ceap",
-            port="3307"  
-        )
-        if conn.is_connected():
-            print('Conectado ao MySQL com sucesso.')
-            return conn
-    except Error as e:
-        print(f'Erro ao conectar ao MySQL: {e}')
-        return None
-
-def buscar_usuario_por_rfid(conn, codigo_rfid):
-    try:
-        cursor = conn.cursor(dictionary=True)
-        query = "SELECT nome_aluno FROM alunos WHERE codigo_rfid = %s"
-        cursor.execute(query, (codigo_rfid,))
-        result = cursor.fetchone()
-        cursor.close()
-        if result:
-            print(f'Usuário encontrado: {result["nome_aluno"]}')
-        else:
-            print('Usuário não encontrado.')
-        return result['nome_aluno'] if result else None
-    except Error as e:
-        print(f'Erro ao buscar usuário: {e}')
-        return None
-
-def inserir_alunos(conn, codigo_rfid, nome):
-    try:
-        cursor = conn.cursor()
-        data_hora = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        query = "INSERT INTO alunos (codigo_rfid, nome_aluno, data_hora) VALUES (%s, %s, %s)"
-        cursor.execute(query, (codigo_rfid, nome, data_hora))
-        conn.commit()
-        cursor.close()
-        print('Leitura inserida com sucesso.')
-    except Error as e:
-        print(f'Erro ao inserir leitura: {e}')
+from scanner import buscar_usuario_por_rfid, inserir_alunos
+from DB import conectar_mysql
 
 def processar_rfid(conn, codigo_rfid):
     print(f'Processando código RFID: {codigo_rfid}')
@@ -69,7 +25,7 @@ def capturar_rfid():
     print(f'Código RFID capturado: {codigo_rfid}')
     return codigo_rfid
 
-if __name__ == '__main__':
+def main():
     conn = conectar_mysql()
     if conn:
         try:
@@ -81,3 +37,5 @@ if __name__ == '__main__':
         finally:
             conn.close()
             print("Conexão MySQL encerrada.")
+if __name__ == '__main__':
+    main()
