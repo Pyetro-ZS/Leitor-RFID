@@ -21,8 +21,12 @@ def capturar_rfid():
                 break
             else:
                 codigo_rfid += event.name
-    print(f'Código RFID capturado: {codigo_rfid}')
-    return codigo_rfid
+    if len(codigo_rfid) == 8:  # Exemplo de verificação de comprimento
+        print(f'Código RFID capturado: {codigo_rfid}')
+        return codigo_rfid
+    else:
+        print('Entrada inválida, tente novamente.')
+        return None
 
 def main():
     conn = conectar_mysql()
@@ -30,7 +34,8 @@ def main():
         try:
             while True:
                 codigo_rfid = capturar_rfid()
-                processar_rfid(conn, codigo_rfid)
+                if codigo_rfid:
+                    processar_rfid(conn, codigo_rfid)
         except KeyboardInterrupt:
             print("Encerrando...")
         finally:
